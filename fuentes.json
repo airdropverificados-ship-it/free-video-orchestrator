@@ -1,0 +1,233 @@
+{
+  "_nota": "Cuotas tomadas de investigacion/gpu-gratis.md (21 nov 2026), que corrige el informe previo de APIs gratis: Lightning AI ya NO da 15 créditos/mes (son 5 créditos UNA SOLA VEZ) y Kaggle retiró el P100 (solo T4 ×2). 'estado_cuota': documentada = verificada en fuente oficial, sin prueba propia; probada = probada por nosotros; no-publicada = el proveedor no publica la cuota; estimacion = número estimado por nosotros o por terceros, sin medir. Periodo 'una-vez': bono único que no se renueva (el consumo nunca se resetea). No se inventa ninguna cuota: donde no hay dato, el coste es null y la fuente NO se asigna sola. Modal NO está en esta lista: exige método de pago en archivo (excluido, ver investigación §8).",
+  "fuentes": [
+    {
+      "coste_por_clip_5s": {
+        "cantidad": 20,
+        "estado": "estimacion",
+        "rango": [
+          15,
+          25
+        ],
+        "unidad": "minutos-gpu"
+      },
+      "cuota": {
+        "cantidad": null,
+        "estado": "no-publicada",
+        "periodo": "semana",
+        "unidad": "minutos-gpu"
+      },
+      "id": "colab",
+      "marca_agua": false,
+      "modelo": "Wan 2.2 TI2V-5B (pesos abiertos, Apache 2.0)",
+      "nombre": "Google Colab gratis (T4)",
+      "notas": "Google no publica la cuota: el uso intensivo bloquea la GPU de 1 a 5 días. Sesiones de hasta 12 h. Terceros estiman ~15-30 GPU-h/semana; el repo usa ~10-20 h/semana como rango conservador para planificar (estimación, sin medir). El orquestador NO puede medir la cuota de Colab: el usuario la gestiona a mano (si Colab dice 'sin GPU', esa fuente queda en pausa). Coste por clip 15-25 min (estimación del repo, sin medir).",
+      "prioridad": 1,
+      "resolucion": "480p (720p con fallback)",
+      "tipo": "gpu-libre",
+      "uso_comercial": "permitido"
+    },
+    {
+      "coste_por_clip_5s": {
+        "cantidad": 20,
+        "estado": "estimacion",
+        "rango": [
+          15,
+          25
+        ],
+        "unidad": "minutos-gpu"
+      },
+      "cuota": {
+        "cantidad": 1800,
+        "estado": "documentada",
+        "periodo": "semana",
+        "unidad": "minutos-gpu"
+      },
+      "id": "kaggle",
+      "marca_agua": false,
+      "modelo": "Wan 2.2 TI2V-5B (pesos abiertos, Apache 2.0)",
+      "nombre": "Kaggle Notebooks (T4 ×2)",
+      "notas": "30 GPU-horas/semana (1.800 minutos-GPU, documentada). El P100 se retiró el 15 sep 2026: solo queda T4 ×2. ADVERTENCIA SMS: Kaggle exige verificación por SMS para activar la GPU (una sola vez, un número por cuenta) y el SMS puede no llegar a algunos países; probar el SMS es el PRIMER paso antes de planificar nada, porque sin él Kaggle queda en 0. Potencial sin probar: 1 h de cuota = 1 h de pared con DOS T4, así que 2 clips en paralelo (uno por T4) duplicarían el rendimiento; pendiente de verificar que dos procesos caben en los 29 GB de RAM del notebook. Coste por clip estimado igual que Colab (misma T4), sin medir.",
+      "prioridad": 2,
+      "resolucion": "480p (720p con fallback)",
+      "tipo": "gpu-libre",
+      "uso_comercial": "permitido"
+    },
+    {
+      "coste_por_clip_5s": {
+        "cantidad": 9,
+        "estado": "estimacion",
+        "rango": [
+          5,
+          9
+        ],
+        "unidad": "minutos-gpu"
+      },
+      "cuota": {
+        "cantidad": 1248,
+        "estado": "estimacion",
+        "periodo": "una-vez",
+        "unidad": "minutos-gpu"
+      },
+      "id": "lium",
+      "marca_agua": false,
+      "modelo": "Wan 2.2 TI2V-5B (pesos abiertos, Apache 2.0)",
+      "nombre": "Lium (RTX 3090/4090)",
+      "notas": "BONO ÚNICO: $5 al confirmar el email, sin tarjeta, UNA SOLA VEZ. Expira a los 14 días: gastarlo pronto o se pierde. Rendimiento estimado por terceros ~20,8 GPU-h (1.248 minutos-GPU, estimación, no cifra oficial de Lium). RTX 3090/4090 de 24 GB: el script oficial de Wan 2.2 a 720p SÍ cabe. Coste por clip <9 min según el README de Wan en GPU de consumo (clase 4090), sin medir en Lium. Sin cuaderno adaptado todavía: se usa el de Kaggle como base.",
+      "prioridad": 3,
+      "resolucion": "720p",
+      "tipo": "gpu-libre",
+      "uso_comercial": "permitido"
+    },
+    {
+      "coste_por_clip_5s": {
+        "cantidad": 20,
+        "estado": "estimacion",
+        "rango": [
+          15,
+          25
+        ],
+        "unidad": "minutos-gpu"
+      },
+      "cuota": {
+        "cantidad": 540,
+        "estado": "documentada",
+        "periodo": "una-vez",
+        "unidad": "minutos-gpu"
+      },
+      "id": "lightning",
+      "marca_agua": false,
+      "modelo": "Wan 2.2 TI2V-5B (pesos abiertos, Apache 2.0)",
+      "nombre": "Lightning AI Studio (T4/L4)",
+      "notas": "BONO ÚNICO (corrección 21 nov 2026): 5 créditos al registrarse, UNA SOLA VEZ, sin tarjeta ≈ 9 h de T4 (540 minutos-GPU). Los 25 créditos restantes (hasta 30) exigen añadir una tarjeta. Los créditos no usados expiran a los 12 meses. En L4 de 24 GB (~$0,79/h) rinde ~6,3 h y el script oficial de Wan 2.2 a 720p SÍ cabe; en T4, vía GGUF/offload. Guardar para los clips que necesiten máxima calidad. Sin cuaderno adaptado todavía: se usa el de Kaggle como base. Coste por clip estimado, sin medir.",
+      "prioridad": 4,
+      "resolucion": "480p (720p con fallback)",
+      "tipo": "gpu-libre",
+      "uso_comercial": "permitido"
+    },
+    {
+      "coste_por_clip_5s": null,
+      "cuota": {
+        "cantidad": 0,
+        "estado": "documentada",
+        "periodo": "una-vez",
+        "unidad": "minutos-gpu"
+      },
+      "id": "akash",
+      "marca_agua": false,
+      "modelo": "Wan 2.2 TI2V-5B (pesos abiertos, Apache 2.0)",
+      "nombre": "Akash Network (RTX 3090, en verificación)",
+      "notas": "CONFLICTO EN LA DOCUMENTACIÓN OFICIAL: la Quick Start dice que la prueba de $1 incluye GPUs hasta RTX 3090, pero la Guía de Onboarding dice que los créditos de prueba son solo CPU. Se cuentan 0 GPU-h hasta verificarlo una vez. Si la GPU de prueba funciona: $1 ≈ 6,7 GPU-h en RTX 3090 (estimación, ~$0,15/h), ventana de 30 días, despliegues de máx. 24 h. Coste por clip sin medir: el orquestador NO asigna clips aquí solo. Uso manual: verificar primero si la GPU de prueba funciona, medir el tiempo, y solo entonces registrar el coste.",
+      "prioridad": 5,
+      "resolucion": "720p",
+      "tipo": "gpu-libre",
+      "uso_comercial": "permitido"
+    },
+    {
+      "coste_por_clip_5s": null,
+      "cuota": {
+        "cantidad": 5,
+        "estado": "documentada",
+        "periodo": "dia",
+        "unidad": "minutos-gpu"
+      },
+      "id": "zerogpu",
+      "marca_agua": false,
+      "modelo": "Spaces ZeroGPU existentes (Wan/Hunyuan según el Space)",
+      "nombre": "Hugging Face ZeroGPU (Spaces)",
+      "notas": "5 min de GPU/día (RTX Pro 6000 Blackwell, 48 GB). SIN MEDIR: no se sabe cuánto tarda un clip de 5 s en un Space ZeroGPU, así que el orquestador NO asigna clips aquí solo. Uso manual: probar un Space, medir el tiempo, y solo entonces registrar el coste. Posible límite adicional no documentado de 3 ejecuciones/día. No se cuenta en el total de clips semanales.",
+      "prioridad": 6,
+      "resolucion": "según el Space",
+      "tipo": "gpu-libre",
+      "uso_comercial": "permitido"
+    },
+    {
+      "coste_por_clip_5s": {
+        "cantidad": 22,
+        "estado": "documentada",
+        "unidad": "creditos"
+      },
+      "cuota": {
+        "cantidad": 120,
+        "estado": "documentada",
+        "periodo": "dia",
+        "unidad": "creditos"
+      },
+      "id": "dreamina",
+      "marca_agua": true,
+      "modelo": "Seedance 2.0",
+      "nombre": "Dreamina / Seedance (ByteDance)",
+      "notas": "120 créditos/día ≈ 5 clips de 5 s/día. Con marca de agua; uso comercial no claro. Solo complemento: los clips de aquí NO son consistentes con los de Wan y llevan marca de agua.",
+      "prioridad": 7,
+      "resolucion": "720p",
+      "tipo": "api-video",
+      "uso_comercial": "no-claro"
+    },
+    {
+      "coste_por_clip_5s": {
+        "cantidad": 30,
+        "estado": "documentada",
+        "rango": [
+          10,
+          30
+        ],
+        "unidad": "creditos"
+      },
+      "cuota": {
+        "cantidad": 66,
+        "estado": "documentada",
+        "periodo": "dia",
+        "unidad": "creditos"
+      },
+      "id": "kling",
+      "marca_agua": true,
+      "modelo": "Kling (imagen a vídeo)",
+      "nombre": "Kling",
+      "notas": "66 créditos/día, resetean cada 24 h sin acumular. Coste por clip EN DISPUTA: 10 créditos según unas fuentes, 30 según otras. Se usa 30 (peor caso) para no sobre-prometer: ~2 clips/día. Sin uso comercial.",
+      "prioridad": 8,
+      "resolucion": "720p",
+      "tipo": "api-video",
+      "uso_comercial": "prohibido"
+    },
+    {
+      "coste_por_clip_5s": {
+        "cantidad": 50,
+        "estado": "documentada",
+        "unidad": "creditos"
+      },
+      "cuota": {
+        "cantidad": 30,
+        "estado": "documentada",
+        "periodo": "dia",
+        "unidad": "creditos"
+      },
+      "id": "pixverse",
+      "marca_agua": true,
+      "modelo": "PixVerse V6",
+      "nombre": "PixVerse",
+      "notas": "30 créditos/día; V6 a 720p con sonido cuesta 10 créditos/s, así que 5 s cuestan 50 créditos: la cuota diaria NO alcanza para un clip de 5 s a 720p. A 540p sin sonido rinde más, pero sin cifra publicada. En la práctica, PixVerse solo sirve para clips de ~3 s o menos. Sin uso comercial.",
+      "prioridad": 9,
+      "resolucion": "540p en free",
+      "tipo": "api-video",
+      "uso_comercial": "prohibido"
+    },
+    {
+      "coste_por_clip_5s": null,
+      "cuota": {
+        "cantidad": 30,
+        "estado": "documentada",
+        "periodo": "dia",
+        "unidad": "creditos"
+      },
+      "id": "vidnoz",
+      "marca_agua": true,
+      "modelo": "Avatar parlante",
+      "nombre": "Vidnoz",
+      "notas": "30 créditos/día ≈ 60 s de avatar parlante. NO genera clips Fruti con personajes: solo avatares que hablan. No asignable a clips de novela; queda en el registro como vía para vídeos de presentador.",
+      "prioridad": 10,
+      "resolucion": "según plantilla",
+      "tipo": "api-video-avatar",
+      "uso_comercial": "no-claro"
+    }
+  ]
+}
