@@ -1,229 +1,209 @@
 # Free Video Orchestrator — $0-budget AI video generation
 
-> **In English:** this orchestrator splits a video chapter into short clips and
-> distributes them across **free GPU sources** (Google Colab, Kaggle, Lightning AI)
-> running open-weight video models, with free video APIs only as a fallback.
-> Scripts, voice-over (Piper TTS), assembly and QC run locally. Budget: **$0**
-> — no card, no paid credits. The detailed documentation below is in Spanish.
+> Split a video chapter into short clips and distribute them across **free
+> GPU sources** (Google Colab, Kaggle, Lightning AI) running open-weight
+> video models, with free video APIs only as a fallback. Scripts, voice-over
+> (Piper TTS), assembly and QC run locally. Budget: **$0** — no card, no paid
+> credits.
 
-# Orquestador de generación de vídeo gratis — Fruti Novelas
+## Honest numbers (marked preliminary where they are)
 
-Reparte los clips de un capítulo entre **todas las fuentes gratuitas**
-de generación de vídeo, recoge y verifica los clips, y orquesta el
-pipeline local del repositorio `video-generator-repo` (validar guion →
-voz → ensamblar → QC).
+One Fruti chapter ≈ 85 s of video ≈ 17 clips of 5 s (or 9 clips of 10 s;
+cost per clip scales with duration).
 
-**Presupuesto: $0.** Sin créditos de pago, sin tarjeta, sin
-supercomputadora. La laptop hace texto, voz, ensamblaje y QC; el vídeo
-se genera en GPU gratis (Colab/Kaggle/Lightning) con modelos abiertos,
-y solo como complemento en APIs de vídeo gratis.
-
-**Regla de prioridad:** GPU gratis con modelos abiertos primero (sin
-marca de agua, licencia abierta, personajes consistentes). Las APIs de
-vídeo gratis solo como complemento, y cada clip asignado allí queda
-marcado con marca de agua y sin licencia comercial (o no clara).
-
----
-
-## Números honestos (preliminares donde se indica)
-
-Un capítulo Fruti ≈ 85 s de vídeo ≈ 17 clips de 5 s (o 9 clips de 10 s;
-el coste por clip escala con la duración).
-
-| Recurso | Capacidad | Estado del número |
+| Resource | Capacity | Status of the number |
 |---|---|---|
-| Guiones (Pollinations / Groq) | Miles al día | Probado (Pollinations) / documentado (Groq) |
-| Imágenes de referencia | 10.000+/mes | Documentado |
-| Voz (Piper TTS, local) | **Ilimitada** | **Probado** (8 WAV reales, ver abajo) |
-| Vídeo GPU libre recurrente (Kaggle 30 h/sem + Colab ~10–20 h/sem) | ~40–50 GPU-h/semana → **2–6 capítulos/semana realistas** | Kaggle **documentado** (30 h/sem); Colab **estimado** (sin cuota publicada, terceros: 15–30 h/sem); coste 10–30 min/clip **estimado, sin medir**; sobrecarga 30–50% estimada |
-| Bonos únicos (Lightning ~9 h + Lium ~21 h + Akash 0–6,7 h) | ~30–37 GPU-h **UNA SOLA VEZ** (no semanal) | Lightning **documentado** (5 créditos de registro); Lium **estimado** por terceros (~20,8 h); Akash **en conflicto** (0 h hasta verificar) |
-| Vídeo APIs gratis (Dreamina + Kling + PixVerse) | ~57 clips de 5 s/semana ≈ **3 capítulos/semana**, con marca de agua | Documentado (cuotas del informe); Kling usa el peor caso (30 créd/clip, en disputa 10–30) |
+| Scripts (Pollinations / Groq) | Thousands per day | Tested (Pollinations) / documented (Groq) |
+| Reference images | 10,000+/month | Documented |
+| Voice (Piper TTS, local) | **Unlimited** | **Tested** (8 real WAVs, see below) |
+| Recurring free GPU (Kaggle 30 h/week + Colab ~10–20 h/week) | ~40–50 GPU-h/week → **2–6 chapters/week realistic** | Kaggle **documented** (30 h/week); Colab **estimated** (no published quota; third parties: 15–30 h/week); cost 10–30 min/clip **estimated, unmeasured**; overhead 30–50% estimated |
+| One-time bonuses (Lightning ~9 h + Lium ~21 h + Akash 0–6.7 h) | ~30–37 GPU-h **ONE TIME ONLY** (not weekly) | Lightning **documented** (5 signup credits); Lium **estimated** by third parties (~20.8 h); Akash **in conflict** (0 h until verified) |
+| Free video APIs (Dreamina + Kling + PixVerse) | ~57 clips of 5 s/week ≈ **3 chapters/week**, watermarked | Documented (quotas from the research); Kling uses the worst case (30 credits/clip, disputed 10–30) |
 
-**Ritmo realista con $0: 2–6 capítulos/semana sin marca de agua** (Kaggle
-30 h/sem verificadas + Colab ~10–20 h/sem estimadas = 40–50 GPU-h/sem;
-a 10–30 min por clip de 5 s en T4 y con 30–50% de sobrecarga por
-descargas, colas y fallos, eso rinde ~40–200 clips/semana, o sea
-~2–6 capítulos de 85 s). Los bonos únicos añaden ~30–37 GPU-h una sola
-vez (un impulso inicial, no producción sostenida). Las APIs suman hasta
-~3 capítulos/semana extra con marca de agua si se usan todos los días.
-**2 capítulos al día NO es alcanzable con $0** a estos tiempos.
+**Realistic pace at $0: 2–6 chapters/week without a watermark** (Kaggle
+30 h/week verified + Colab ~10–20 h/week estimated = 40–50 GPU-h/week;
+at 10–30 min per 5 s clip on a T4 with 30–50% overhead for downloads,
+queues and failures, that yields ~40–200 clips/week, i.e. ~2–6 chapters
+of 85 s). One-time bonuses add ~30–37 GPU-h once (an initial boost, not
+sustained production). The APIs add up to ~3 chapters/week extra with a
+watermark if used every day. **2 chapters a day is NOT achievable at $0**
+at these speeds.
 
-> ⚠️ **Primer paso antes de planificar nada: probar el SMS de Kaggle.**
-> Kaggle exige verificación por SMS para activar la GPU y el SMS puede
-> no llegar a algunos países. Sin Kaggle, el total recurrente cae a
-> solo Colab (~10–20 h/semana) y el ritmo a ~1–3 capítulos/semana.
+> ⚠️ **First step before planning anything: test the Kaggle SMS.**
+> Kaggle requires SMS verification to enable the GPU, and the SMS may not
+> reach some countries. Without Kaggle, recurring total drops to Colab
+> only (~10–20 h/week) and the pace to ~1–3 chapters/week.
 
-**Calidad:** 480p por defecto (480×832 vertical, la verificada en la T4
-gratis). 720p es opción, con fallback automático a 480p si hay falta de
-memoria. Los clips de API salen a 540p–720p según el servicio.
+**Quality:** 480p by default (480×832 vertical, the one verified on a free
+T4). 720p is an option, with automatic fallback to 480p on out-of-memory.
+API clips come out at 540p–720p depending on the service.
 
-## Límites (léelos antes de prometer nada)
+## Limits (read before promising anything)
 
-1. **Las cuotas cambian sin aviso.** Las de este proyecto son de la
-   investigación del 21 nov 2026 (`investigacion/gpu-gratis.md`); antes
-   de planificar un mes, verifica la cuota en la cuenta real.
-2. **Kaggle exige SMS para la GPU.** El código a algunos números puede
-   no llegar; sin él no hay GPU de Kaggle y el total recurrente cae a
-   solo Colab. Probar el SMS es el primer paso.
-3. **Colab no publica su cuota.** El uso intensivo bloquea la GPU de 1 a
-   5 días. El orquestador registra el consumo pero no puede saber el
-   límite: cuando Colab diga que no hay GPU, la fuente se pausa a mano.
-4. **El tiempo por clip (10–30 min en T4) es una estimación sin medir.**
-   La primera corrida real en cada plataforma mide el tiempo y alimenta
-   `registro.jsonl`; hasta entonces, todos los "capítulos/semana" son
-   preliminares.
-5. **Marca de agua y licencia en las APIs de nube.** Kling, PixVerse y
-   Hailuo prohíben el uso comercial en sus planes gratis; Dreamina no lo
-   aclara. Los vídeos de Fruti se monetizan, así que esos clips no
-   cumplen los términos para uso comercial. Las vías sin ese problema
-   son los modelos abiertos en GPU gratis (licencia abierta).
-6. **Personajes inconsistentes entre proveedores.** Un capítulo mezclado
-   entre Wan y las APIs tendrá personajes distintos. Para consistencia,
-   un capítulo entero debe salir de la misma fuente (o de Wan en
-   Colab+Kaggle, con las mismas referencias).
-7. **Wan genera vídeo mudo.** La narración (Piper) y la música se añaden
-   en el ensamblaje.
-8. **Cuentas pendientes de crear** (ver abajo): Kaggle, Lightning,
-   Lium, Akash, ZeroGPU y las APIs. No se creó ninguna cuenta para este
-   proyecto.
-9. **Cuba:** Google bloquea oficialmente Cuba en Gemini/Flow/AI Studio.
-   Colab y Kaggle son de Google y figuran como "sin verificar" para
-   Cuba en el informe: pueden funcionar o no desde algunas redes.
-   Desde esta VM (salida por EE. UU.) sí son accesibles.
+1. **Quotas change without notice.** The ones in this project are from the
+   research of 21 Nov 2026 (`investigacion/gpu-gratis.md`); before planning
+   a month, check the quota in the real account.
+2. **Kaggle requires SMS for the GPU.** The code may not reach some phone
+   numbers; without it there is no Kaggle GPU and the recurring total drops
+   to Colab only. Testing the SMS is the first step.
+3. **Colab publishes no quota.** Heavy use blocks the GPU for 1–5 days.
+   The orchestrator records usage but cannot know the limit: when Colab
+   says there is no GPU, the source is paused by hand.
+4. **Time per clip (10–30 min on a T4) is an unmeasured estimate.** The
+   first real run on each platform measures the time and feeds
+   `registro.jsonl`; until then, all "chapters/week" figures are
+   preliminary.
+5. **Watermark and licence on cloud APIs.** Kling, PixVerse and Hailuo
+   forbid commercial use on their free plans; Dreamina does not clarify.
+   Fruti videos are monetised, so those clips do not meet the terms for
+   commercial use. The routes without that problem are open models on
+   free GPU (open licence).
+6. **Inconsistent characters across providers.** A chapter mixed between
+   Wan and the APIs will have different characters. For consistency, a
+   whole chapter must come from one source (or from Wan on Colab+Kaggle,
+   with the same references).
+7. **Wan generates silent video.** Narration (Piper) and music are added
+   at assembly.
+8. **Accounts not yet created** (see below): Kaggle, Lightning, Lium,
+   Akash, ZeroGPU and the APIs. No account was created for this project.
+9. **Google officially blocks Cuba in Gemini/Flow/AI Studio.** Colab and
+   Kaggle are Google services and are listed as "unverified" for Cuba in
+   the report: they may or may not work from some networks. From this VM
+   (egress via the US) they are reachable.
 
----
-
-## Estructura
+## Layout
 
 ```
-solucion-video-gratis/
-├── fuentes.json                  # registro de fuentes + cuotas de la investigación
-├── investigacion/gpu-gratis.md  # investigación de GPU gratis (21 nov 2026)
-├── VERIFICACION.md              # verificación independiente (21 nov 2026)
+.
+├── fuentes.json                  # source registry + quotas from the research
+├── investigacion/gpu-gratis.md  # free-GPU research (21 Nov 2026, Spanish)
+├── VERIFICACION.md              # independent verification (21 Nov 2026, Spanish)
 ├── orquestador/
-│   ├── cola.py                  # cola de clips reanudable (JSON)
-│   ├── fuentes.py               # registro + seguimiento de cuotas
-│   ├── asignar.py               # reparte clips entre fuentes
-│   ├── recolectar.py            # verifica los clips generados (ffprobe)
-│   ├── pipeline.py              # flujo local (llama al repo por subprocess)
+│   ├── cola.py                  # resumable clip queue (JSON)
+│   ├── fuentes.py               # registry + quota tracking
+│   ├── asignar.py               # splits clips across sources
+│   ├── recolectar.py            # verifies generated clips (ffprobe)
+│   ├── pipeline.py              # local flow (calls the companion repo)
 │   └── cli.py                   # CLI: plan, estado, recolectar, ensamblar
-├── voz/piper_tts.py             # narración con Piper TTS (probado)
-├── guion/llm_gratis.py          # guiones con Pollinations (sin clave) o Groq
-├── plantillas/kaggle-generar-clips.ipynb   # cuaderno de generación para Kaggle
-├── tests/test_orquestador.py    # 31 tests, sin GPU ni red
-└── README.md                    # este archivo
+├── voz/piper_tts.py             # narration with Piper TTS (tested)
+├── guion/llm_gratis.py          # scripts with Pollinations (no key) or Groq
+├── plantillas/kaggle-generar-clips.ipynb   # generation notebook for Kaggle
+├── tests/test_orquestador.py    # 31 tests, no GPU or network
+└── README.md                    # this file
 ```
 
-**Sin dependencias de Python** salvo la biblioteca estándar. Requiere
-`ffmpeg`/`ffprobe` en el PATH, y opcionalmente `piper-tts` (voz) y
-`faster-whisper` (puertas de QC con transcripción). Las claves solo por
-variables de entorno (`GROQ_API_KEY`); ningún archivo guarda secretos.
+**No Python dependencies** beyond the standard library. Requires
+`ffmpeg`/`ffprobe` on the PATH, and optionally `piper-tts` (voice) and
+`faster-whisper` (transcription QC gates). Keys only via environment
+variables (`GROQ_API_KEY`); no file stores secrets.
 
----
+> **Note:** assembly (`ensamblar`) calls scripts from the separate
+> `video-generator-repo` companion repository (validation, assembly, QC),
+> which is **not included here**. Point to it with `--repo` or
+> `VIDEO_GENERATOR_REPO` (default `~/workspace/video-generator-repo`).
+> Planning, quota tracking, clip collection and voice work fully here.
 
-## Flujo completo paso a paso
+## Full flow, step by step
 
-### Paso 0 — Instalar lo local (una sola vez)
+### Step 0 — Install the local bits (once)
 
 ```bash
-pip install piper-tts        # voz (opcional si usas WAV externos)
-# ffmpeg: https://ffmpeg.org/download.html (en la laptop)
-# Descargar una voz en español (~77 MB, una sola vez):
-#   es_ES-sharvard-medium.onnx + .onnx.json desde
+pip install piper-tts        # voice (optional if you use external WAVs)
+# ffmpeg: https://ffmpeg.org/download.html
+# Download one Spanish voice (~77 MB, once):
+#   es_ES-sharvard-medium.onnx + .onnx.json from
 #   https://huggingface.co/rhasspy/piper-voices/tree/main/es/es_ES/sharvard/medium
 ```
 
-El repo `video-generator-repo` debe estar en
-`~/workspace/video-generator-repo` (o pasa `--repo` / define
-`VIDEO_GENERATOR_REPO`).
-
-### Paso 1 — Guion (gratis, sin clave)
+### Step 1 — Script (free, no key)
 
 ```bash
-python guion/llm_gratis.py --idea "Fresita descubre que Celia le mintió" \
+python guion/llm_gratis.py --idea "Fresita discovers Celia lied to her" \
     --salida cap-01/guion.json
-# O con Groq (más rápido; necesita GROQ_API_KEY en el entorno):
-#   export GROQ_API_KEY='tu-clave'
+# Or with Groq (faster; needs GROQ_API_KEY in the environment):
+#   export GROQ_API_KEY='your-key'
 #   python guion/llm_gratis.py --idea "..." --salida cap-01/guion.json \
 #       --proveedor groq
 ```
 
-Pollinations respeta su límite de 1 respuesta cada 30–45 s (el script
-espera 40 s entre llamadas, incluso entre corridas). El guion se valida
-con las reglas Fruti (diálogo denso, sin suspiros, gancho en el clip 1)
-antes de guardarse como válido. También puedes escribir el guion a mano
-copiando `ejemplos/capitulo-ejemplo/guion-ejemplo.json` del repo.
+Pollinations enforces a limit of 1 response every 30–45 s (the script
+waits 40 s between calls, even across runs). The script is validated
+against the Fruti rules (dense dialogue, no sighs, hook in clip 1)
+before it is saved as valid. You can also write the script by hand in
+the same JSON format.
 
-### Paso 2 — Plan: validar, jobs, cola y asignación
+### Step 2 — Plan: validate, jobs, queue and assignment
 
 ```bash
 python -m orquestador.cli plan --guion cap-01/guion.json --trabajo cap-01/
 ```
 
-Valida el guion, prepara `jobs.json`, crea la cola (`cola.json`) y
-asigna cada clip a la fuente con cuota disponible, en orden de
-prioridad (Colab → Kaggle → Lightning → Dreamina → Kling → PixVerse).
-El consumo se reserva al asignar. Si un clip no cabe en ninguna fuente,
-el plan lo dice: no se promete lo que no cabe.
+Validates the script, prepares `jobs.json`, creates the queue
+(`cola.json`) and assigns each clip to the source with available quota,
+in priority order (Colab → Kaggle → Lightning → Dreamina → Kling →
+PixVerse). Usage is reserved at assignment. If a clip fits no source,
+the plan says so: nothing is promised that does not fit.
 
-Consulta el estado en cualquier momento:
+Check the status at any time:
 
 ```bash
 python -m orquestador.cli estado --trabajo cap-01/
-python -m orquestador.cli capacidad   # capacidad semanal estimada
+python -m orquestador.cli capacidad   # estimated weekly capacity
 ```
 
-### Paso 3 — Generar los clips (externo: GPU gratis o APIs)
+### Step 3 — Generate the clips (external: free GPU or APIs)
 
-**GPU gratis (recomendado, sin marca de agua):**
+**Free GPU (recommended, no watermark):**
 
-- **Colab:** sube `jobs.json` + `refs/` a Drive y abre
-  `colab/generar-clips.ipynb` del repo (Entorno → GPU).
-- **Kaggle:** crea un dataset con `jobs.json` + `refs/`, adjúntalo y
-  abre `plantillas/kaggle-generar-clips.ipynb` (Settings → Accelerator
-  → GPU). Al terminar: **Save Version → Output** para descargar los
-  clips.
-- **Lightning:** usa el cuaderno de Kaggle como base (sin adaptación
-  propia todavía). Guardar sus 5 créditos para los clips de máxima
-  calidad (L4 24 GB, script oficial 720p).
-- **Lium:** usa el cuaderno de Kaggle como base (sin adaptación propia
-  todavía). Gastar pronto: el bono de $5 expira a los 14 días.
+- **Colab:** upload `jobs.json` + `refs/` to Drive and open a
+  generation notebook (Runtime → GPU). No Colab notebook is included in
+  this repo yet — use the Kaggle notebook below as the base.
+- **Kaggle:** create a dataset with `jobs.json` + `refs/`, attach it and
+  open `plantillas/kaggle-generar-clips.ipynb` (Settings → Accelerator
+  → GPU). When done: **Save Version → Output** to download the clips.
+- **Lightning:** use the Kaggle notebook as a base (no dedicated
+  adaptation yet). Save its 5 credits for the highest-quality clips
+  (L4 24 GB, official 720p script).
+- **Lium:** use the Kaggle notebook as a base (no dedicated adaptation
+  yet). Spend soon: the $5 bonus expires after 14 days.
 
-Los cuadernos generan clip por clip, guardan cada uno en cuanto
-termina, registran el tiempo real en `registro.jsonl` y se detienen
-limpios antes del corte de sesión (~10,5 h). La siguiente sesión
-retoma donde quedó.
+The notebooks generate clip by clip, save each one as soon as it
+finishes, record the real time in `registro.jsonl` and stop cleanly
+before the session cut (~10.5 h). The next session resumes where it
+left off.
 
-**APIs gratis (complemento, con marca de agua):** genera los clips
-asignados a Dreamina/Kling/PixVerse en sus webs, con el prompt y la
-referencia de `jobs.json`, y descárgalos a la carpeta de clips.
+**Free APIs (supplement, watermarked):** generate the clips assigned to
+Dreamina/Kling/PixVerse on their websites, with the prompt and
+reference from `jobs.json`, and download them into the clips folder.
 
-### Paso 4 — Recolectar y verificar
+### Step 4 — Collect and verify
 
 ```bash
 python -m orquestador.cli recolectar --trabajo cap-01/ --clips cap-01/clips/
 ```
 
-Comprueba cada clip: existe, pesa más de 10 KB, ffprobe lo lee (tiene
-stream de vídeo) y dura lo que el guion pide (±1 s). Un clip que falla
-vuelve a pendiente para regenerarse (máx. 3 intentos); uno que no
-aparece se deja en espera salvo que pases `--marcar-faltantes`.
+Checks every clip: it exists, is over 10 KB, ffprobe reads it (it has a
+video stream) and lasts what the script asks (±1 s). A failing clip goes
+back to pending for regeneration (max 3 attempts); a missing one stays
+on hold unless you pass `--marcar-faltantes`.
 
-### Paso 5 — Voz (Piper, ilimitada, local)
+### Step 5 — Voice (Piper, unlimited, local)
 
 ```bash
 python voz/piper_tts.py --guion cap-01/guion.json --salida cap-01/wavs/
-# Una voz distinta por personaje:
+# A different voice per character:
 #   python voz/piper_tts.py --guion ... --salida ... --mapa-voces mapa.json
 ```
 
-Genera un WAV por clip y recorta el silencio de cabeza/cola con
-`recortar_silencios.py` del repo (normaliza a 48 kHz mono). Si
-`piper-tts` no está instalado, el script explica cómo instalarlo y sale
-con error claro. Voces en español: `es_ES-sharvard-medium` (probada),
+Generates one WAV per clip. Head/tail silence is trimmed when the
+companion `video-generator-repo` is available (its
+`recortar_silencios.py`); otherwise the script warns and keeps the
+audio untrimmed. Output is normalised to 48 kHz mono. If `piper-tts`
+is not installed, the script explains how to install it and exits with
+a clear error. Spanish voices: `es_ES-sharvard-medium` (tested),
 `es_ES-davefx-medium`, `es_AR-daniela-high`, `es_MX-claude-high`.
 
-### Paso 6 — Ensamblar + QC
+### Step 6 — Assemble + QC
 
 ```bash
 python -m orquestador.cli ensamblar --guion cap-01/guion.json \
@@ -231,94 +211,85 @@ python -m orquestador.cli ensamblar --guion cap-01/guion.json \
     --salida cap-01/capitulo.mp4 --musica musica.mp3
 ```
 
-Ejecuta el flujo local completo: validar → jobs → voz → (comprueba que
-estén todos los clips) → ensamblar → QC. El ensamblaje usa la
-corrección anti-desync (concat con re-codificación de audio + conteo de
-muestras). **Un capítulo que no pasa el QC NO se publica.** Con
-`--sin-whisper` se saltan las puertas de transcripción y el informe lo
-marca como NO VERIFICADO (no como aprobado).
+Runs the full local flow: validate → jobs → voice → (checks all clips
+are present) → assemble → QC, using the companion
+`video-generator-repo`. Assembly uses the anti-desync fix (concat with
+re-encoded audio + sample counting). **A chapter that fails QC is NOT
+published.** With `--sin-whisper` the transcription gates are skipped
+and the report marks the result NOT VERIFIED (not approved).
 
-### Paso 7 — Publicación
+### Step 7 — Publishing
 
-```bash
-python publicacion/preparar_post.py --guion cap-01/guion.json \
-    --salida cap-01/posts/
-```
+Captions, first comments and hashtags are prepared with your existing
+publishing tools (no publishing script is included in this repo). Before
+scheduling, verify no other post with the same content/slot exists, to
+avoid duplicates.
 
-Prepara caption + primer comentario + hashtags (script del repo). La
-programación se hace con las herramientas existentes (CLI de Facebook,
-etc.). Regla anti-duplicados: verificar antes de programar que no
-existe otro post con el mismo contenido/slot.
+## Creating the accounts (exact steps; none created here)
 
----
+None of these accounts exists yet. All are free and card-free. Create
+them from the browser with your email.
 
-## Crear las cuentas (pasos exactos, sin crear ninguna aquí)
-
-Ninguna de estas cuentas existe todavía. Todas son gratis y sin
-tarjeta. Se crean desde el navegador con tu correo.
-
-| Cuenta | Pasos |
+| Account | Steps |
 |---|---|
-| **Kaggle** | 1. https://www.kaggle.com → Sign Up → con Google. 2. Verificar el correo. 3. **PROBAR PRIMERO el SMS**: en un Notebook, Settings → Accelerator → GPU T4 x2; Kaggle pedirá verificar un número de teléfono para activar la GPU (una sola vez). Si el SMS no llega, Kaggle queda en 0. 4. Crear un Dataset con `jobs.json` + `refs/` y adjuntarlo al cuaderno (Add data → Your Datasets). |
-| **Lightning AI** | 1. https://lightning.ai → Sign up con Google o GitHub. 2. Crear un Studio con GPU T4 o L4. Cuota: **5 créditos UNA SOLA VEZ** ≈ 9 h de T4 (o ~6,3 h de L4); los 25 restantes exigen tarjeta. |
-| **Lium** | 1. https://lium.io → registro con email y confirmarlo (sin tarjeta). 2. Bono de **$5 UNA SOLA VEZ** (~21 GPU-h estimadas en RTX 3090/4090). **Expira a los 14 días**: gastarlo pronto. |
-| **Akash** | 1. https://akash.network → Console, registro con email (sin tarjeta). 2. Bono de **$1 UNA SOLA VEZ** (30 días). **Verificar primero** si la GPU de prueba funciona de verdad (la documentación oficial se contradice: una página dice que la prueba incluye GPU hasta RTX 3090, otra que los créditos de prueba son solo CPU). Hasta verificar, se cuentan 0 h. |
-| **Hugging Face (ZeroGPU)** | 1. https://huggingface.co/join → cuenta gratis con correo. 2. Usar Spaces ZeroGPU existentes (p. ej. demos de Wan): 5 min de GPU/día. No hay cuaderno propio: es uso manual por Space. |
-| **Dreamina** | 1. https://dreamina.capcut.com → Sign up con Google o correo. 2. 120 créditos/día ≈ 5 clips de 5 s/día. |
-| **Kling** | 1. https://kling.ai → Sign up con Google o correo. 2. 66 créditos/día ≈ 2 clips de 5 s/día (peor caso). |
-| **PixVerse** | 1. https://pixverse.ai → Sign up con Google o correo. 2. 30 créditos/día (no alcanzan para un clip de 5 s a 720p; sirven para clips de ~3 s o menos). |
-| **Groq (opcional, guiones)** | 1. https://console.groq.com → Sign up con Google. 2. API Keys → Create API Key. 3. `export GROQ_API_KEY='la-clave'` (nunca en un archivo). Sin tarjeta. |
+| **Kaggle** | 1. https://www.kaggle.com → Sign Up → with Google. 2. Verify the email. 3. **Test the SMS FIRST**: in a Notebook, Settings → Accelerator → GPU T4 x2; Kaggle will ask to verify a phone number to enable the GPU (once). If the SMS never arrives, Kaggle is 0. 4. Create a Dataset with `jobs.json` + `refs/` and attach it to the notebook (Add data → Your Datasets). |
+| **Lightning AI** | 1. https://lightning.ai → Sign up with Google or GitHub. 2. Create a Studio with a T4 or L4 GPU. Quota: **5 credits ONE TIME ONLY** ≈ 9 h of T4 (or ~6.3 h of L4); the other 25 require a card. |
+| **Lium** | 1. https://lium.io → sign up with email and confirm it (no card). 2. **$5 bonus ONE TIME ONLY** (~21 estimated GPU-h on RTX 3090/4090). **Expires after 14 days**: spend it soon. |
+| **Akash** | 1. https://akash.network → Console, sign up with email (no card). 2. **$1 bonus ONE TIME ONLY** (30 days). **Verify first** whether the trial GPU really works (the official docs contradict each other: one page says the trial includes GPUs up to RTX 3090, another that trial credits are CPU-only). Until verified, count 0 h. |
+| **Hugging Face (ZeroGPU)** | 1. https://huggingface.co/join → free account with email. 2. Use existing ZeroGPU Spaces (e.g. Wan demos): 5 min of GPU/day. No dedicated notebook: manual use per Space. |
+| **Dreamina** | 1. https://dreamina.capcut.com → Sign up with Google or email. 2. 120 credits/day ≈ 5 clips of 5 s/day. |
+| **Kling** | 1. https://kling.ai → Sign up with Google or email. 2. 66 credits/day ≈ 2 clips of 5 s/day (worst case). |
+| **PixVerse** | 1. https://pixverse.ai → Sign up with Google or email. 2. 30 credits/day (not enough for one 5 s clip at 720p; enough for ~3 s clips or less). |
+| **Groq (optional, scripts)** | 1. https://console.groq.com → Sign up with Google. 2. API Keys → Create API Key. 3. `export GROQ_API_KEY='your-key'` (never in a file). No card. |
 
----
+## What is verified and what is not
 
-## Qué está verificado y qué no
+Verified in this project (21 Nov 2026; detail in VERIFICACION.md, in
+Spanish):
 
-Verificado en este proyecto (21 nov 2026; detalle en VERIFICACION.md):
+- **31 tests green** (`python -m pytest tests/` or `python -m unittest
+  discover -s tests`): queue, resume, quotas (daily/weekly reset, one-time
+  bonuses without reset), priority assignment, collection with the 8 real
+  sample clips, pipeline (validate + jobs), Pollinations rate limit,
+  Piper (detection and install message).
+- **CLI end to end** with the sample chapter: plan (8 clips assigned to
+  Colab) → collect (8/8 verified) → status → capacity (free GPU: 90
+  clips/week Kaggle alone, not counting Colab or the one-time bonuses;
+  APIs: 57 clips/week).
+- **Piper TTS end to end:** 8 WAVs generated with
+  `es_ES-sharvard-medium` (3.0–4.5 s each, 48 kHz mono, silence
+  trimmed), all inside their 5 s clips.
+- **Assembly end to end:** a 40 s chapter with the sample clips + the
+  Piper WAVs (drift 0.13 s, within the 0.3 s max); duration, silence
+  and desync QC gates green (Whisper deliberately skipped with
+  `--sin-whisper`).
+- **Kaggle notebook** validated with `nbformat`, all code cells parsed.
 
-- **31 tests en verde** (`python -m unittest discover -s tests`): cola,
-  reanudación, cuotas (reseteo diario/semanal, bonos únicos sin
-  reseteo), asignación por prioridad, recolecta con los 8 clips reales
-  de la muestra, pipeline (validar + jobs), rate limit de Pollinations,
-  Piper (detección y mensaje de instalación).
-- **CLI de punta a punta** con el capítulo de ejemplo: plan (8 clips
-  asignados a Colab) → recolecta (8/8 verificados) → estado → capacidad
-  (GPU libre: 90 clips/semana solo Kaggle, sin contar Colab ni los
-  bonos únicos; APIs: 57 clips/semana).
-- **Piper TTS de punta a punta:** 8 WAV generados con
-  `es_ES-sharvard-medium` (3,0–4,5 s cada uno, 48 kHz mono, silencio
-  recortado), todos dentro de sus clips de 5 s.
-- **Ensamblaje de punta a punta:** capítulo de 40 s con los clips de la
-  muestra + los WAV de Piper (drift 0,13 s, dentro del máx. 0,3 s);
-  puertas de QC de duración, silencio y desync en verde (Whisper
-  saltado a propósito con `--sin-whisper`).
-- **Cuaderno de Kaggle** validado con `nbformat` y con todas sus celdas
-  de código parseadas.
+NOT verified (pending the first real run):
 
-NO verificado (pendiente de la primera corrida real):
+- **The Kaggle SMS** (first step: if it never arrives, Kaggle = 0).
+- Real time per clip on a T4 (Colab and Kaggle): 10–30 min is an estimate.
+- A real generation on Kaggle (account not yet created).
+- The Lium (~21 h estimated) and Akash (trial GPU in conflict) bonuses:
+  untested, no account.
+- ZeroGPU: time per clip unmeasured; never assigned alone.
+- The real Colab quota (unpublished) and whether Colab/Kaggle work from
+  every network.
+- Same-character consistency in clips generated on Kaggle.
+- A full chapter produced ONLY with this orchestrator + free GPU (the test
+  used the sample clips, already generated).
 
-- **El SMS de Kaggle a Cuba** (primer paso: si no llega, Kaggle = 0).
-- Tiempo real por clip en T4 (Colab y Kaggle): 10–30 min es estimación.
-- Una generación real en Kaggle (cuenta pendiente de crear).
-- Los bonos de Lium (~21 h estimadas) y Akash (GPU de prueba en
-  conflicto): sin probar, sin cuenta.
-- ZeroGPU: tiempo por clip sin medir; no se asigna solo.
-- La cuota real de Colab (no publicada) y si Colab/Kaggle funcionan
-  desde Cuba.
-- Consistencia del mismo personaje en clips generados en Kaggle.
-- Un capítulo completo producido SOLO con este orquestador + GPU gratis
-  (la prueba usó los clips de la muestra, ya generados).
+## Environment variables
 
-## Variables de entorno
-
-| Variable | Para qué |
+| Variable | What for |
 |---|---|
-| `GROQ_API_KEY` | Clave de Groq (guiones). Opcional; sin ella, usa Pollinations. |
-| `VIDEO_GENERATOR_REPO` | Ruta del repo (por defecto `~/workspace/video-generator-repo`). |
-| `PIPER_VOICES_DIR` | Carpeta con los `.onnx` de Piper (por defecto `~/workspace/apis-gratis-ia/pruebas/piper-voices/`). |
-| `PLANTILLA_GUION` | Plantilla de guion (por defecto la del repo). |
+| `GROQ_API_KEY` | Groq key (scripts). Optional; without it, uses Pollinations. |
+| `VIDEO_GENERATOR_REPO` | Path of the companion repo (default `~/workspace/video-generator-repo`). |
+| `PIPER_VOICES_DIR` | Folder with the Piper `.onnx` voices (default `~/workspace/apis-gratis-ia/pruebas/piper-voices/`). |
+| `PLANTILLA_GUION` | Script template (default: the one in the repo). |
 
-## Licencia
+## License
 
-MIT. Los modelos usados (Wan 2.2, Apache 2.0; Piper, GPL-3.0; las
-voces, según su licencia — revisar antes de uso comercial) mantienen
-sus propias licencias.
+MIT. The models used (Wan 2.2, Apache 2.0; Piper, GPL-3.0; the voices,
+per their own licence — check before commercial use) keep their own
+licences.
